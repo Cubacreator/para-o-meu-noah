@@ -1,0 +1,1 @@
+Envie aqui as 13 fotos da surpresa, direto da galeria do celular. Um fluxo do GitHub converte as imagens para assets/foto-00.webp ate foto-12.webp automaticamente. A primeira em ordem alfabetica deve ser a foto das aliancas.
