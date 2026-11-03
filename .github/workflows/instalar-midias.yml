@@ -1,0 +1,29 @@
+name: Instalar fotos e musica da carta
+on:
+  push:
+    paths:
+      - 'Carta_para_Noah_site_completo.zip'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  instalar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extrair somente os arquivos da surpresa
+        run: |
+          unzip -o Carta_para_Noah_site_completo.zip 'assets/*'
+          test -s assets/foto-00.webp
+          test -s assets/violao-original.ogg
+      - name: Publicar arquivos da carta
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/
+          if ! git diff --cached --quiet; then
+            git commit -m "Adiciona fotos e violao da surpresa"
+            git push
+          fi
