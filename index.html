@@ -266,15 +266,16 @@ main{position:relative;z-index:1;padding:48px 18px 70px;animation:appear 1.4s ea
 <p class="para">Mais que ontem e menos que amanhã.</p>
 <p class="para">Com todo o meu carinho, todos os surtos, todos os beijos e todos os fumos do mundo,</p>
 <p class="para"><strong>Sua Raissa. ❤️</strong></p></article><section class="end reveal"><span class="small">Ainda temos tanta história pela frente</span><h2>Quem sabe a gente não aprende a tocar a nossa música juntos?</h2><p class="signature">Pra você, eu também tô sempre. ♡</p><span class="small">Com carinho, sua Raissa</span></section></main>
-<div class="music hide" id="music"><button id="toggle" aria-label="Tocar ou pausar música">▶</button><span id="music-status" role="status">♪ Violão instrumental · toque para ouvir</span><input id="volume" aria-label="Volume" type="range" min="0" max="100" value="25" title="Volume da música"></div><audio id="audio" preload="auto" loop><source src="assets/violao-original.mp3" type="audio/mpeg"><source src="assets/violao-original.ogg" type="audio/ogg"></audio>
+<div class="music hide" id="music" style="display:flex;flex-direction:column;align-items:stretch;width:295px;max-width:calc(100vw - 20px);border-radius:15px;padding:10px">
+ <span style="max-width:none;text-align:center;font-size:12px">♫ Como Não Me Apaixonar — Jorge & Mateus</span>
+ <div style="height:205px;width:100%;border-radius:8px;overflow:hidden">
+ <iframe id="musicFrame" title="Como Não Me Apaixonar — áudio oficial" width="100%" height="205" style="border:0" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen src="https://www.youtube.com/embed/J96pIUD_OEY?enablejsapi=1&playsinline=1"></iframe>
+ </div>
+ <span style="max-width:none;text-align:center;font-size:11px">Aperte ▶ para ouvir a versão original. Ajuste o volume no vídeo.</span>
+ <a href="https://www.youtube.com/watch?v=J96pIUD_OEY" target="_blank" rel="noopener" style="color:#f1d4c4;font-size:11px;text-align:center">Abrir no YouTube</a>
+ </div>
 <script>
-const audio=document.getElementById('audio'),toggle=document.getElementById('toggle'),musicStatus=document.getElementById('music-status');
-const updateMusicUI=()=>{const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Pausar música':'Tocar música');musicStatus.textContent=playing?'♪ Violão instrumental tocando':'♪ Violão instrumental · toque para ouvir'};
-audio.addEventListener('play',updateMusicUI);audio.addEventListener('pause',updateMusicUI);
-audio.addEventListener('error',()=>{musicStatus.textContent='Áudio indisponível — verifique a pasta assets';});
-document.getElementById('open').addEventListener('click',async()=>{document.getElementById('intro').classList.add('hide');document.getElementById('content').classList.remove('hide');document.getElementById('music').classList.remove('hide');audio.volume=.25;try{await audio.play()}catch(e){musicStatus.textContent='♪ Clique em ▶ para tocar o violão';}updateMusicUI();window.scrollTo(0,0)});
-toggle.addEventListener('click',async()=>{if(audio.paused){try{await audio.play()}catch(e){musicStatus.textContent='Não foi possível tocar o áudio';}}else{audio.pause()}updateMusicUI()});
-document.getElementById('volume').addEventListener('input',e=>audio.volume=Number(e.target.value)/100);
+document.getElementById('open').addEventListener('click',()=>{document.getElementById('intro').classList.add('hide');document.getElementById('content').classList.remove('hide');document.getElementById('music').classList.remove('hide');window.scrollTo(0,0)});
 window.addEventListener('scroll',()=>{const doc=document.documentElement;const max=doc.scrollHeight-innerHeight;document.getElementById('progress').style.width=(max>0?Math.min(100,scrollY/max*100):0)+'%'});
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.08});document.querySelectorAll('.reveal').forEach(x=>io.observe(x));
 </script></body></html>
