@@ -1,0 +1,71 @@
+name: Preparar fotos e violao
+on:
+  push:
+    paths:
+      - 'fotos/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  montar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar conversor de imagens
+        run: python -m pip install pillow
+      - name: Converter fotos e gerar instrumental original
+        run: |
+          mkdir -p assets
+          cat > /tmp/preparar.py <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps
+          import math, wave, struct, random
+          fotos = sorted(p for p in Path("fotos").iterdir() if p.suffix.lower() in (".jpg",".jpeg",".png",".webp")) if Path("fotos").exists() else []
+          for i, arquivo in enumerate(fotos[:13]):
+              with Image.open(arquivo) as im:
+                  im = ImageOps.exif_transpose(im).convert("RGB")
+                  im.thumbnail((1600,1000))
+                  im.save(f"assets/foto-{i:02d}.webp", "WEBP", quality=85, method=6)
+          # Peça original de violão sintetizado, acordes G, D, Em, C
+          sample_rate=22050
+          bpm=74
+          beat=60/bpm
+          chords=[[196,246.94,293.66,392],[146.83,220,293.66,369.99],
+                  [164.81,246.94,329.63,392],[130.81,196,261.63,329.63]]
+          total=int(beat*8*8*sample_rate)
+          samples=[0.0]*total
+          random.seed(18)
+          for bar in range(16):
+              chord=chords[bar%4]
+              for step in range(8):
+                  t0=(bar*4+step*0.5)*beat
+                  freq=chord[[0,2,1,3,0,2,1,3][step]]
+                  start=int(t0*sample_rate)
+                  duration=int(beat*1.8*sample_rate)
+                  for k in range(duration):
+                      j=start+k
+                      if j>=total: break
+                      t=k/sample_rate
+                      env=(1-math.exp(-t*48))*math.exp(-t*3.1)
+                      v=(math.sin(2*math.pi*freq*t)+0.32*math.sin(4*math.pi*freq*t)+0.14*math.sin(6*math.pi*freq*t))
+                      samples[j]+=v*env*.13
+          peak=max(abs(v) for v in samples) or 1
+          with wave.open("/tmp/violao.wav","wb") as w:
+              w.setnchannels(1);w.setsampwidth(2);w.setframerate(sample_rate)
+              for i in range(0,total,4096):
+                  w.writeframes(b''.join(struct.pack("<h",int(max(-1,min(1,v/peak*.67))*32767)) for v in samples[i:i+4096]))
+          print("Fotos convertidas:",len(fotos))
+          PY
+          python /tmp/preparar.py
+          ffmpeg -y -loglevel error -i /tmp/violao.wav -c:a libvorbis -q:a 5 assets/violao-original.ogg
+      - name: Salvar arquivos gerados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/
+          if ! git diff --cached --quiet; then
+            git commit -m "Prepara fotos e instrumental original"
+            git push
+          fi
